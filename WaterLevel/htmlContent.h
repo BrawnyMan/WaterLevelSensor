@@ -41,10 +41,12 @@ const char* htmlContent = R"rawliteral(
             options: {
                 scales: {
                     x: {
-                        reverse: true,
                         title: {
                             display: true,
                             text: 'Čas (s)'
+                        },
+                        ticks: {
+                          autoSkip: false
                         }
                     },
                     y: {
@@ -54,8 +56,7 @@ const char* htmlContent = R"rawliteral(
                             text: 'Dolžina (cm)'
                         }
                     }
-                },
-                responsive: true
+                }
             }
         });
 
