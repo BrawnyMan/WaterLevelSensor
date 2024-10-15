@@ -48,7 +48,8 @@ The following is an example of the graphical interface displayed on the web page
 ## How to Use
 
 1. **Install ESP8266 Library**: Ensure you have the ESP8266 module library installed in your Arduino IDE.
-2. **Connect the Hardware**: Set up the ultrasonic sensor according to the schematic provided.
-3. **Upload the Code**: Flash the Arduino D1 with the provided code.
-4. **Monitor the Serial**: Open the serial monitor to get the IP address of the device.
-5. **Access the Web Interface**: Type the IP address shown in the serial monitor into your web browser to view real-time water level measurements and graph.
+2. **Install NTPClient Library**: Make sure the NTPClient library is installed to handle network time protocol synchronization.
+3. **Connect the Hardware**: Set up the ultrasonic sensor according to the schematic provided.
+4. **Upload the Code**: Flash the Arduino D1 with the provided code.
+5. **Monitor the Serial**: Open the serial monitor to get the IP address of the device.
+6. **Access the Web Interface**: Type the IP address shown in the serial monitor into your web browser to view real-time water level measurements and graph.
