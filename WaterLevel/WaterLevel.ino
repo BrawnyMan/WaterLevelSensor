@@ -1,6 +1,6 @@
-// #include <ESP8266WiFi.h>
+#include <time.h>
+#include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-// #include <FS.h>
 
 #include "credentials.h"
 #include "ports.h"
@@ -8,14 +8,19 @@
 
 ESP8266WebServer server(80);
 
+const float maxHeight = 200.0;
 const int maxReadings = 30;
 float distanceReadings[maxReadings];
+String timeReadings[maxReadings];
 int currentIndex = 0;
 int waitTimeInSeconds = 5;
 
+const char* ntpServer = "pool.ntp.org";
+const long gmtOffset = 3600;
+const int daylightOffset = 3600;
+
 void setup() {
   Serial.begin(115200);
-
   delay(5000);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -30,6 +35,8 @@ void setup() {
 
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
+
+  configTime(gmtOffset, daylightOffset, ntpServer);
 
   server.on("/", HTTP_GET, handleRoot);
   server.on("/data", HTTP_GET, handleData);
@@ -66,24 +73,40 @@ void measureDistance() {
   distance = duration * 0.0344 / 2;
 
   distanceReadings[currentIndex] = distance;
+
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+
+  // char timeStringBuff[6];
+  // strftime(timeStringBuff, sizeof(timeStringBuff), "%H:%M", &timeinfo);
+
+  char timeStringBuff[9];
+  strftime(timeStringBuff, sizeof(timeStringBuff), "%H:%M:%S", &timeinfo);
+
+  timeReadings[currentIndex] = String(timeStringBuff);
+
   currentIndex = (currentIndex + 1) % maxReadings;
 }
 
 void handleData() {
   String json = "{ \"labels\": [";
   for (int i = 0; i < maxReadings; i++) {
-    json += String(i * waitTimeInSeconds);
+    int index = (currentIndex + i) % maxReadings;
+    json += "\"" + timeReadings[index] + "\"";
     if (i < maxReadings - 1) {
       json += ",";
     }
   }
-  
+
   json += "], \"readings\": [";
 
-  for (int i = maxReadings - 1; i >= 0; i--) {
+  for (int i = 0; i < maxReadings; i++) {
     int index = (currentIndex + i) % maxReadings;
-    json += String(distanceReadings[index]);
-    if (i > 0) {
+    json += String(maxHeight - distanceReadings[index]);
+    if (i < maxReadings - 1) {
       json += ",";
     }
   }
